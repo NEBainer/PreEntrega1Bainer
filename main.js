@@ -36,7 +36,14 @@ while (debenPlata) {
         alert("Respuesta no válida. Por favor, ingrese 'si' o 'no'.");
     }
 }
-
+// Variable que utilizo para establecer cuanto le sobra o cuanto queda debiendo de plata 
+let vuelto = plataTotal - deudaTotal;
 // Mostrar resultados al final
-alert(`Deuda total: ${deudaTotal}`);
-alert(`Dinero total que posee: ${plataTotal}`);
+alert(`En total debes: ${deudaTotal} pesos y tenés: ${plataTotal} pesos`);
+// Condicional que utilizo para informar cuanta plata le queda a la persona
+if (deudaTotal >= plataTotal) {
+    alert (`No te alcanza ni para un caramelo amigo, empeza a gastar menos. Tenes: ${vuelto} pesos`);
+}
+else {
+    alert (`Bien ahí amigo, estas sobrado de plata. Tenes: ${vuelto} pesos`);
+}

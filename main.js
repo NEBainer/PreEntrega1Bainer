@@ -1,0 +1,1 @@
+let deudaTarjeta = Number(prompt)

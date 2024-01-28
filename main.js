@@ -1,66 +1,123 @@
-//Algoritmo para calcular deudas//
-//Funcion en el cual se solicita al usuario que ingrese un monto//
-function obtenerCantidad(mensaje) {
-    return parseFloat(prompt(mensaje));
+// Función para obtener el nombre del usuario
+function obtenerNombre() {
+    return prompt("Ingrese su nombre:");
 }
-//Funcion para calcular los impuestos que serian un 10% sobre la deuda total
-function calcularImpuestos(deudaTotal) {
-    const impuestos = deudaTotal * 0.1;
+
+// Función en la cual se solicita al usuario que ingrese un monto válido
+function obtenerCantidad(mensaje) {
+    let cantidad;
+    do {
+        cantidad = parseFloat(prompt(mensaje));
+        if (isNaN(cantidad)) {
+            alert("Por favor, ingrese un número válido.");
+        }
+    } while (isNaN(cantidad));
+    return cantidad;
+}
+
+// Función para calcular los impuestos con opción dinámica
+function calcularImpuestosDinamicos(deudaTotal) {
+    let impuestos = 0;
+    const aplicarImpuestos = prompt("¿Desea aplicar impuestos? Ingrese 'si' o 'no': ");
+
+    if (aplicarImpuestos.toLowerCase() === 'si') {
+        const porcentajeImpuestos = parseFloat(prompt("Ingrese el porcentaje de impuestos a aplicar: "));
+        impuestos = deudaTotal * (porcentajeImpuestos / 100);
+    }
+
     return impuestos;
 }
-//Sector en donde se le solicita al usuario ingresar sus deudas y cantidad de dinero que posee//
-let deudaTarjeta = obtenerCantidad("Ingrese la deuda que tiene con su tarjeta");
-let deudaMp = obtenerCantidad("Ingrese la deuda que posee con MercadoPago");
-let plata = obtenerCantidad("Ingrese la cantidad de dinero que posee");
 
-let tieneDeuda = true; //Variable que utilizo para definir si continua o sigue el ciclo while de deudas//
-let deudaTotal = deudaTarjeta + deudaMp; // Variable que utilizo como acumulador para las deudas//
+// Objeto Deuda
+function Deuda(monto, tipo) {
+    this.monto = monto;
+    this.tipo = tipo;
+}
 
-//Ciclo while que uso para verificar si posee alguna deuda mas//
-while (tieneDeuda) {
-    const respuesta = prompt("¿Posee usted alguna deuda más? Ingrese 'si' o 'no': ");
+// Array para almacenar deudas
+let deudas = [];
 
-    if (respuesta.toLowerCase() === 'si') {
-        const montoDeuda = obtenerCantidad("Ingrese la cantidad de dinero que adeuda: ");
-        deudaTotal += montoDeuda;
-    } else if (respuesta.toLowerCase() === 'no') {
-        tieneDeuda = false;
-    } else {
+// Método para agregar una nueva deuda al array
+function agregarDeuda(monto, tipo) {
+    let nuevaDeuda = new Deuda(monto, tipo);
+    deudas.push(nuevaDeuda);
+}
+
+// Método para buscar deudas por tipo utilizando filter
+function buscarDeudasPorTipo(tipo) {
+    return deudas.filter(deuda => deuda.tipo === tipo);
+}
+
+// Obtener nombre del usuario
+let nombreUsuario = obtenerNombre();
+alert(`Hola, ${nombreUsuario}! Bienvenido al sistema de gestión de deudas.`);
+
+// Preguntar al usuario sobre sus deudas
+let continuarDeudas = true;
+while (continuarDeudas) {
+    const montoDeuda = obtenerCantidad("Ingrese el monto de la deuda:");
+    const tipoDeuda = prompt("Ingrese el tipo de deuda:");
+    agregarDeuda(montoDeuda, tipoDeuda);
+
+    const respuesta = prompt("¿Desea ingresar otra deuda? Ingrese 'si' para continuar o 'no' para finalizar:");
+    if (respuesta.toLowerCase() === 'no') {
+        continuarDeudas = false;
+    } else if (respuesta.toLowerCase() !== 'si') {
         alert("Respuesta no válida. Por favor, ingrese 'si' o 'no'.");
     }
 }
 
-let debenPlata = true; //Variable que uso para definir si continua o sigue el ciclo while de plata que le deben al usuario//
-let plataTotal = plata; //Variable que uso como acumulador para la plata que posee el usuario//
+// Calcular total de deudas
+let deudaTotal = 0;
+deudas.forEach(deuda => {
+    deudaTotal += deuda.monto;
+});
 
-//Ciclo while que uso para verificar si le deben dinero al usuario//
-while (debenPlata) {
-    const respuesta = prompt("¿Alguien le debe dinero a usted? Ingrese 'si' o 'no': ");
+// Obtener la cantidad de dinero que posee
+let plataTotal = obtenerCantidad("Ingrese la cantidad de dinero que posee:");
 
-    if (respuesta.toLowerCase() === 'si') {
-        const montoDeben = obtenerCantidad("Ingrese la cantidad de dinero que le deben: ");
-        plataTotal += montoDeben;
-    } else if (respuesta.toLowerCase() === 'no') {
-        debenPlata = false;
-    } else {
-        alert("Respuesta no válida. Por favor, ingrese 'si' o 'no'.");
-    }
-}
-// Sector en donde calculo los impuestos //
-const impuestos = calcularImpuestos(deudaTotal);
+// Calcular impuestos
+const impuestos = calcularImpuestosDinamicos(deudaTotal);
 
-// Variable que utilizo para establecer cuanto le sobra o cuanto queda debiendo de plata//
+// Calcular vuelto
 let vuelto = plataTotal - deudaTotal;
 
-//Variable que uso para concatenar todas las ultimas lineas de codigo al final y no tener que mostrarlo en varios mensajes//
-let mensaje = `Tenes una deuda de ${deudaTotal} pesos. Los impuestos que se te aplican son un total de ${impuestos} pesos. Por lo que la deuda quedaria en ${deudaTotal += impuestos} pesos. Posees un total de ${plataTotal} pesos.`; 
-
-
-//Condicional que muestra al usuario si le sobra plata o debe plata//
-if (deudaTotal >= plataTotal) {
-    mensaje += `\nNo te alcanza ni para un caramelo, amigo. Debes plata. Tenes ${vuelto} pesos.`;
+// Construir mensaje
+let mensaje = `Hola, ${nombreUsuario}!`;
+mensaje += `\nTienes una deuda total de ${deudaTotal} pesos.`;
+if (impuestos > 0) {
+    mensaje += `\nLos impuestos que se te aplican son un total de ${impuestos} pesos.`;
+    mensaje += `\nPor lo que la deuda quedaría en ${deudaTotal + impuestos} pesos.`;
+}
+mensaje += `\nPosees un total de ${plataTotal} pesos.`;
+if (vuelto < 0) {
+    mensaje += `\nDebes plata. Tienes un saldo negativo de ${vuelto} pesos.`;
 } else {
-    mensaje += `\nBien ahí, amigo. Estás sobrado de plata. Despues de pagar tus deudas te sobran ${vuelto} pesos.`;
+    mensaje += `\nDespués de pagar tus deudas te sobran ${vuelto} pesos.`;
+}
+
+// Preguntar si desea ver detalladamente alguna de sus deudas
+const verDetalles = prompt("¿Quisiera ver detalladamente alguna de sus deudas? Ingrese 'si' o 'no':");
+if (verDetalles.toLowerCase() === 'si') {
+    const deudaSeleccionada = prompt("Ingrese el tipo de deuda que desea ver detalladamente o 'todas' para ver todas las deudas:");
+    if (deudaSeleccionada.toLowerCase() === 'todas') {
+        mensaje += `\nDetalles de todas las deudas:`;
+        deudas.forEach(deuda => {
+            mensaje += `\n - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}`;
+        });
+    } else {
+        const deudasTipo = buscarDeudasPorTipo(deudaSeleccionada);
+        if (deudasTipo.length > 0) {
+            mensaje += `\nDetalles de las deudas de tipo ${deudaSeleccionada}:`;
+            deudasTipo.forEach(deuda => {
+                mensaje += `\n - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}`;
+            });
+        } else {
+            mensaje += `\nNo tienes deudas de tipo ${deudaSeleccionada}.`;
+        }
+    }
+} else if (verDetalles.toLowerCase() !== 'no') {
+    mensaje += `\nRespuesta no válida. No se mostrarán detalles de las deudas.`;
 }
 
 alert(mensaje);

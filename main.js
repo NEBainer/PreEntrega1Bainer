@@ -1,30 +1,22 @@
 // Función para obtener el nombre del usuario
 function obtenerNombre() {
-    return prompt("Ingrese su nombre:");
+    return document.getElementById("nombreUsuario").value || "Usuario";
 }
 
-// Función en la cual se solicita al usuario que ingrese un monto válido
-function obtenerCantidad(mensaje) {
-    let cantidad;
-    do {
-        cantidad = parseFloat(prompt(mensaje));
-        if (isNaN(cantidad)) {
-            alert("Por favor, ingrese un número válido.");
-        }
-    } while (isNaN(cantidad));
-    return cantidad;
+// Función para obtener una cantidad válida
+function obtenerCantidad() {
+    const monto = parseFloat(document.getElementById("montoDeuda").value);
+    return isNaN(monto) ? 0 : monto;
 }
 
-// Función para calcular los impuestos con opción dinámica
-function calcularImpuestosDinamicos(deudaTotal) {
+// Función para calcular impuestos
+function calcularImpuestos(deudaTotal) {
     let impuestos = 0;
-    const aplicarImpuestos = prompt("¿Desea aplicar impuestos? Ingrese 'si' o 'no': ");
-
-    if (aplicarImpuestos.toLowerCase() === 'si') {
-        const porcentajeImpuestos = parseFloat(prompt("Ingrese el porcentaje de impuestos a aplicar: "));
+    const aplicarImpuestos = document.getElementById("aplicarImpuestos").checked;
+    if (aplicarImpuestos) {
+        const porcentajeImpuestos = parseFloat(document.getElementById("porcentajeImpuestos").value);
         impuestos = deudaTotal * (porcentajeImpuestos / 100);
     }
-
     return impuestos;
 }
 
@@ -48,76 +40,99 @@ function buscarDeudasPorTipo(tipo) {
     return deudas.filter(deuda => deuda.tipo === tipo);
 }
 
-// Obtener nombre del usuario
-let nombreUsuario = obtenerNombre();
-alert(`Hola, ${nombreUsuario}! Bienvenido al sistema de gestión de deudas.`);
-
-// Preguntar al usuario sobre sus deudas
-let continuarDeudas = true;
-while (continuarDeudas) {
-    const montoDeuda = obtenerCantidad("Ingrese el monto de la deuda:");
-    const tipoDeuda = prompt("Ingrese el tipo de deuda:");
-    agregarDeuda(montoDeuda, tipoDeuda);
-
-    const respuesta = prompt("¿Desea ingresar otra deuda? Ingrese 'si' para continuar o 'no' para finalizar:");
-    if (respuesta.toLowerCase() === 'no') {
-        continuarDeudas = false;
-    } else if (respuesta.toLowerCase() !== 'si') {
-        alert("Respuesta no válida. Por favor, ingrese 'si' o 'no'.");
-    }
+// Mostrar mensaje en el DOM
+function mostrarMensaje(mensaje) {
+    const mensajeDiv = document.getElementById("mensaje");
+    mensajeDiv.textContent = mensaje;
 }
 
-// Calcular total de deudas
-let deudaTotal = 0;
-deudas.forEach(deuda => {
-    deudaTotal += deuda.monto;
+// Capturar evento de envío de nombre
+document.getElementById("enviarNombre").addEventListener("click", function(event) {
+    event.preventDefault(); // Evitar comportamiento predeterminado del formulario
+    const nombreUsuario = obtenerNombre();
+    mostrarMensaje(`Hola, ${nombreUsuario}! Bienvenido al sistema de gestión de deudas.`);
 });
 
-// Obtener la cantidad de dinero que posee
-let plataTotal = obtenerCantidad("Ingrese la cantidad de dinero que posee:");
+// Capturar evento de envío de deudas
+document.getElementById("agregarDeuda").addEventListener("click", function(event) {
+    event.preventDefault(); // Evitar comportamiento predeterminado del formulario
+    const montoDeuda = obtenerCantidad();
+    const tipoDeuda = document.getElementById("tipoDeuda").value;
+    agregarDeuda(montoDeuda, tipoDeuda);
+});
 
-// Calcular impuestos
-const impuestos = calcularImpuestosDinamicos(deudaTotal);
+// Capturar evento de cálculo de deudas
+document.getElementById("calcularDeudas").addEventListener("click", function(event) {
+    event.preventDefault(); // Evitar comportamiento predeterminado del formulario
+    
+    // Calcular total de deudas
+    let deudaTotal = 0;
+    deudas.forEach(deuda => {
+        deudaTotal += deuda.monto;
+    });
 
-// Calcular vuelto
-let vuelto = plataTotal - deudaTotal;
+    // Obtener la cantidad de dinero que posee
+    const plataTotal = parseFloat(document.getElementById("plataTotal").value);
 
-// Construir mensaje
-let mensaje = `Hola, ${nombreUsuario}!`;
-mensaje += `\nTienes una deuda total de ${deudaTotal} pesos.`;
-if (impuestos > 0) {
-    mensaje += `\nLos impuestos que se te aplican son un total de ${impuestos} pesos.`;
-    mensaje += `\nPor lo que la deuda quedaría en ${deudaTotal + impuestos} pesos.`;
-}
-mensaje += `\nPosees un total de ${plataTotal} pesos.`;
-if (vuelto < 0) {
-    mensaje += `\nDebes plata. Tienes un saldo negativo de ${vuelto} pesos.`;
-} else {
-    mensaje += `\nDespués de pagar tus deudas te sobran ${vuelto} pesos.`;
-}
+    // Calcular impuestos
+    const impuestos = calcularImpuestos(deudaTotal);
 
-// Preguntar si desea ver detalladamente alguna de sus deudas
-const verDetalles = prompt("¿Quisiera ver detalladamente alguna de sus deudas? Ingrese 'si' o 'no':");
-if (verDetalles.toLowerCase() === 'si') {
-    const deudaSeleccionada = prompt("Ingrese el tipo de deuda que desea ver detalladamente o 'todas' para ver todas las deudas:");
-    if (deudaSeleccionada.toLowerCase() === 'todas') {
-        mensaje += `\nDetalles de todas las deudas:`;
-        deudas.forEach(deuda => {
-            mensaje += `\n - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}`;
-        });
+    // Calcular vuelto
+    const vuelto = plataTotal - deudaTotal;
+
+    // Construir mensaje
+    let mensaje = `Hola, ${obtenerNombre()}!\n`;
+    mensaje += `Tienes una deuda total de ${deudaTotal} pesos.\n`;
+    if (impuestos > 0) {
+        mensaje += `Los impuestos que se te aplican son un total de ${impuestos} pesos.\n`;
+        mensaje += `Por lo que la deuda quedaría en ${deudaTotal + impuestos} pesos.\n`;
+    }
+    mensaje += `Posees un total de ${plataTotal} pesos.\n`;
+    if (vuelto < 0) {
+        mensaje += `Debes plata. Tienes un saldo negativo de ${vuelto} pesos.\n`;
     } else {
-        const deudasTipo = buscarDeudasPorTipo(deudaSeleccionada);
-        if (deudasTipo.length > 0) {
-            mensaje += `\nDetalles de las deudas de tipo ${deudaSeleccionada}:`;
-            deudasTipo.forEach(deuda => {
-                mensaje += `\n - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}`;
+        mensaje += `Después de pagar tus deudas te sobran ${vuelto} pesos.\n`;
+    }
+
+    const verDetalles = document.getElementById("verDetalles").checked;
+    if (verDetalles) {
+        const deudaSeleccionada = document.getElementById("tipoDeudaDetalle").value;
+        if (deudaSeleccionada === 'todas') {
+            mensaje += `Detalles de todas las deudas:\n`;
+            deudas.forEach(deuda => {
+                mensaje += ` - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}\n`;
             });
         } else {
-            mensaje += `\nNo tienes deudas de tipo ${deudaSeleccionada}.`;
+            const deudasTipo = buscarDeudasPorTipo(deudaSeleccionada);
+            if (deudasTipo.length > 0) {
+                mensaje += `Detalles de las deudas de tipo ${deudaSeleccionada}:\n`;
+                deudasTipo.forEach(deuda => {
+                    mensaje += ` - Monto: ${deuda.monto}, Tipo: ${deuda.tipo}\n`;
+                });
+            } else {
+                mensaje += `No tienes deudas de tipo ${deudaSeleccionada}.\n`;
+            }
         }
+    } else {
+        mensaje += `No se mostrarán detalles de las deudas.\n`;
     }
-} else if (verDetalles.toLowerCase() !== 'no') {
-    mensaje += `\nRespuesta no válida. No se mostrarán detalles de las deudas.`;
+
+    mostrarMensaje(mensaje);
+});
+
+// Guardar y cargar datos en el almacenamiento local (localStorage)
+function guardarDatos() {
+    localStorage.setItem("deudas", JSON.stringify(deudas));
 }
 
-alert(mensaje);
+function cargarDatos() {
+    const deudasGuardadas = localStorage.getItem("deudas");
+    if (deudasGuardadas) {
+        deudas = JSON.parse(deudasGuardadas);
+    }
+}
+
+// Cargar datos al iniciar la página
+window.addEventListener("load", function() {
+    cargarDatos();
+});

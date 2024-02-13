@@ -1,11 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculador de deudas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculador de Deudas</title>
 </head>
 <body>
-  <script src="main.js"></script>
+    <h1>Bienvenido al sistema de gestión de deudas</h1>
+    <form id="nombreForm">
+        <label for="nombreUsuario">Ingrese su nombre:</label>
+        <input type="text" id="nombreUsuario">
+        <button id="enviarNombre">Enviar</button>
+    </form>
+
+    <div id="mensaje"></div>
+
+    <form id="deudaForm">
+        <label for="montoDeuda">Monto de la deuda:</label>
+        <input type="number" id="montoDeuda">
+        <label for="tipoDeuda">Tipo de deuda:</label>
+        <input type="text" id="tipoDeuda">
+        <button id="agregarDeuda">Agregar Deuda</button>
+    </form>
+
+    <label for="plataTotal">Ingrese la cantidad de dinero que posee:</label>
+    <input type="number" id="plataTotal">
+
+    <form id="impuestosForm">
+        <label for="aplicarImpuestos">¿Aplicar impuestos?</label>
+        <input type="checkbox" id="aplicarImpuestos">
+        <label for="porcentajeImpuestos">Porcentaje de impuestos:</label>
+        <input type="number" id="porcentajeImpuestos">
+    </form>
+
+    <button id="calcularDeudas">Calcular Deudas</button>
+
+    <form id="verDetallesForm">
+        <label for="verDetalles">¿Quisiera ver detalladamente alguna de sus deudas?</label>
+        <input type="checkbox" id="verDetalles">
+        <label for="tipoDeudaDetalle">Ingrese el tipo de deuda que desea ver detalladamente o 'todas' para ver todas las deudas:</label>
+        <input type="text" id="tipoDeudaDetalle">
+    </form>
+
+    <script src="main.js"></script>
 </body>
 </html>
